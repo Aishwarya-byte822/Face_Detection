@@ -19,6 +19,12 @@ webcam = cv2.VideoCapture(0)
 
 LEFT_EYE = [33, 160, 158, 133, 153, 144]
 
+NOSE = 1
+LEFT_FACE = 234
+RIGHT_FACE = 454
+TOP_FACE = 10
+BOTTOM_FACE = 152
+
 blink_count = 0
 eye_closed = False
 
@@ -42,8 +48,8 @@ while True:
 
     faces = face_cascade.detectMultiScale(
         gray,
-        1.5,
-        4
+        scaleFactor = 1.3,
+        minNeighbors = 5
     )
 
     cv2.putText(
@@ -108,6 +114,53 @@ while True:
             else:
                 eye_closed = False
 
+            nose = landmarks[NOSE]
+            left_face = landmarks[LEFT_FACE]
+            right_face = landmarks[RIGHT_FACE]
+            top_face = landmarks[TOP_FACE]  
+            bottom_face = landmarks[BOTTOM_FACE]
+
+            face_center_x = (
+                left_face.x + right_face.x
+            )/2
+
+            face_center_y = (
+                top_face.y + bottom_face.y
+            )/2
+
+            direction = "Center"
+
+            if nose.x < face_center_x - 0.03:
+                direction = "Looking Left"
+
+            elif nose.x > face_center_x + 0.03:
+                direction = "Looking Right"
+
+            elif nose.y < face_center_y - 0.04:
+                direction = "Lokking Up"
+
+            elif nose.y > face_center_y + 0.04:
+                direction = "Looking Down"
+
+
+            cv2.putText(
+                img,direction,(10,150),cv2.FONT_HERSHEY_SIMPLEX,1,
+                (255,255,0),2
+            )    
+
+            h,w, _ = img.shape
+
+            for point in [
+                NOSE,LEFT_FACE,RIGHT_FACE,TOP_FACE,BOTTOM_FACE
+            ]:  
+
+                px = int(landmarks[point].x*w)
+                py = int(landmarks[point].y*h)  
+
+                cv2.circle(
+                    img,
+                    (px,py),4,(0,255,255),-1
+                )  
     cv2.putText(
         img,
         f"Blinks: {blink_count}",
