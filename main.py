@@ -1,11 +1,11 @@
 import cv2
 import mediapipe as mp
-import math
 
+from utils import distance
+from constants import *
 face_cascade = cv2.CascadeClassifier(
     'haarcascade_frontalface_default.xml'
 )
-
 
 mp_face_mesh = mp.solutions.face_mesh
 
@@ -16,28 +16,10 @@ face_mesh = mp_face_mesh.FaceMesh(
 
 webcam = cv2.VideoCapture(0)
 
-
-LEFT_EYE = [33, 160, 158, 133, 153, 144]
-
-NOSE = 1
-LEFT_FACE = 234
-RIGHT_FACE = 454
-TOP_FACE = 10
-BOTTOM_FACE = 152
-
 blink_count = 0
 eye_closed = False
 
-
-def distance(p1, p2):
-    return math.sqrt(
-        (p1.x - p2.x) ** 2 +
-        (p1.y - p2.y) ** 2
-    )
-
-
 while True:
-
     success, img = webcam.read()
 
     if not success:
@@ -180,5 +162,3 @@ while True:
 
 webcam.release()
 cv2.destroyAllWindows()
-
-
